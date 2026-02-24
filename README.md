@@ -1,6 +1,7 @@
 # Stock Data AI Assistant
 
 An AI-powered stock assistant with both a CLI and a Streamlit web frontend. It fetches real stock data and explains it in clear, simple language. This project is designed for learning: how to ingest market data, parse user questions, and generate grounded explanations.
+![alt text](image.png)
 
 ## Objectives
 - Provide a simple conversational interface for stock questions.
