@@ -1,0 +1,9 @@
+stock-ai-assistant/.env
+
+steps.txt
+
+PROJECT_PIPELINE.txt
+
+.venv\
+Lib\
+Scripts\
