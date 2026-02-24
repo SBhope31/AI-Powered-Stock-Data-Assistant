@@ -1,16 +1,17 @@
 # Stock Data AI Assistant
 
-An AI-powered CLI assistant that fetches real stock data and explains it in clear, simple language. This project is designed for learning: how to ingest market data, parse user questions, and generate grounded explanations.
+An AI-powered stock assistant with both a CLI and a Streamlit web frontend. It fetches real stock data and explains it in clear, simple language. This project is designed for learning: how to ingest market data, parse user questions, and generate grounded explanations.
 
 ## Objectives
 - Provide a simple conversational interface for stock questions.
 - Fetch real market data without a paid market-data API.
 - Translate numeric market data into plain-language explanations.
 - Support multi-company comparisons.
+- Support both terminal and web-based usage.
 - Keep the project educational, transparent, and safe.
 
 ## Requirements
-- Python 3.8+
+- Python 3.9+
 - Internet access (for market data and AI calls)
 - One of:
   - GitHub Models token (`GIT_ACCESS_TOKEN`), or
@@ -19,6 +20,7 @@ An AI-powered CLI assistant that fetches real stock data and explains it in clea
 ## Setup
 1. Install dependencies:
 ```bash
+cd stock-ai-assistant
 pip install -r requirements.txt
 ```
 
@@ -40,9 +42,35 @@ OPENAI_MODEL=gpt-4o-mini
 OPENAI_BASE_URL=
 ```
 
-## Usage
-Run the assistant:
+Notes:
+- The app uses an OpenAI-compatible client and supports both GitHub Models and OpenAI.
+- The default configured models are:
+  - GitHub Models: `openai/gpt-4o-mini`
+  - OpenAI: `gpt-4o-mini`
+- You can change the model using `GITHUB_MODELS_MODEL` or `OPENAI_MODEL`.
+
+## Streamlit Frontend
+The project includes a Streamlit-based web frontend (`app.py`) with a chat-style interface.
+
+Features:
+- Chat-style prompt and response UI
+- Prompt guidelines on the home screen
+- `See Companies` button to view supported companies (Top 50 USA + Top 50 India)
+- AI explanation with fallback to raw stock summary if AI call fails
+
+Run the Streamlit app:
 ```bash
+cd stock-ai-assistant
+python -m streamlit run app.py
+```
+
+If `streamlit` is not recognized in PowerShell, use `python -m streamlit ...` as shown above.
+
+## Usage
+### CLI App
+Run the terminal assistant:
+```bash
+cd stock-ai-assistant
 python stock_assistant.py
 ```
 
@@ -55,11 +83,19 @@ Ask questions like:
 ## How It Works
 1. Parse your question to detect company names and ticker symbols.
 2. Fetch live data from Yahoo Finance via `yfinance`.
-3. Generate an explanation using an AI model.
+3. Generate an explanation using a configurable AI model (GitHub Models or OpenAI).
 4. Present a clean summary with key metrics.
 
 ## Supported Symbols
-The parser recognizes standard tickers and company names. Examples:
+The parser recognizes standard tickers and company names and includes a built-in supported list of:
+- Top 50 USA companies (by market cap)
+- Top 50 India companies (by market cap)
+
+Total built-in supported companies: **100**
+
+The parser also supports direct ticker input (including common Yahoo Finance formats like `BRK-B` and `.NS` / `.BO` symbols).
+
+Examples:
 
 US (examples)
 - AAPL = Apple
@@ -69,7 +105,7 @@ US (examples)
 - AMZN = Amazon
 - META = Meta (Facebook)
 
-India (top 20 by market cap, Feb 2026)
+India (examples from supported list)
 - RELIANCE.NS = Reliance Industries
 - HDB = HDFC Bank
 - BHARTIARTL.NS = Bharti Airtel
@@ -94,11 +130,13 @@ India (top 20 by market cap, Feb 2026)
 Note: Some entries use ADR or BSE symbols (e.g., `HDB`, `IBN`, `AXISBANK.BO`) because those are commonly used by Yahoo Finance data.
 
 ## Project Structure
+- `app.py`: Streamlit web frontend (chat-style UI)
+- `streamlit_app.py`: Earlier Streamlit frontend version (optional/alternate)
 - `stock_assistant.py`: CLI entry point
 - `config.py`: Environment config and validation
 - `ai_service.py`: AI client and prompt logic
 - `data_service.py`: `yfinance` data fetching
-- `parsing.py`: Symbol extraction and mapping
+- `parsing.py`: Symbol extraction, alias mapping, and supported company list (100 companies)
 - `formatting.py`: Summary formatting
 - `models.py`: Data models
 - `requirements.txt`: Python dependencies
@@ -110,7 +148,6 @@ Note: Some entries use ADR or BSE symbols (e.g., `HDB`, `IBN`, `AXISBANK.BO`) be
 - Add charting and technical indicators.
 - Include news and sentiment context.
 - Add unit tests for parsing and data formatting.
-- Provide a web UI in addition to CLI.
 
 ## Open Contributions
 Contributions are welcome. If you want to help:
@@ -119,7 +156,9 @@ Contributions are welcome. If you want to help:
 - Keep changes focused and well-documented.
 
 ## Footnotes
-1. Top 20 Indian company list is based on market-cap rankings from CompaniesMarketCap (snapshot taken Feb 24, 2026). See: https://companiesmarketcap.com/india/largest-companies-in-india-by-market-cap/inr/
+1. Supported company list (Top 50 USA + Top 50 India) is based on market-cap rankings from CompaniesMarketCap (snapshot used on Feb 24, 2026). See:
+   - USA: https://companiesmarketcap.com/usa/largest-companies-in-the-usa-by-market-cap/
+   - India: https://companiesmarketcap.com/india/largest-companies-in-india-by-market-cap/inr/
 
 ## Disclaimer
 This project is for educational purposes only. It is not financial advice.
