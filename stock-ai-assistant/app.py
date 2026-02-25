@@ -359,6 +359,21 @@ def _append_message(role: str, content: str, meta: Optional[str] = None) -> None
     st.session_state.messages.append({"role": role, "content": content, "meta": meta})
 
 
+def _build_history(max_messages: int = 8) -> list[dict[str, str]]:
+    """Return recent chat history in OpenAI format (excluding the latest user prompt)."""
+    history: list[dict[str, str]] = []
+    # Exclude the most recent message (the current user prompt).
+    prior = st.session_state.messages[:-1]
+    if not prior:
+        return history
+    for msg in prior[-max_messages:]:
+        role = msg.get("role")
+        content = msg.get("content")
+        if role in {"user", "assistant"} and content:
+            history.append({"role": role, "content": content})
+    return history
+
+
 def _handle_question(question: str) -> None:
     _append_message("user", question)
 
@@ -396,7 +411,8 @@ def _handle_question(question: str) -> None:
         return
 
     try:
-        answer = explain_with_ai(stock_items, question, config)
+        history = _build_history()
+        answer = explain_with_ai(stock_items, question, config, history=history)
         if not answer:
             raise ValueError("Empty AI response")
         meta = f"Symbols used: {', '.join(item.symbol for item in stock_items)}"

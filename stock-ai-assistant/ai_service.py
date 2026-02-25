@@ -24,7 +24,10 @@ def _build_prompt(stock_data: list[StockData], user_question: str) -> str:
 
 
 def explain_with_ai(
-    stock_data: list[StockData], user_question: str, config: Config
+    stock_data: list[StockData],
+    user_question: str,
+    config: Config,
+    history: list[dict[str, str]] | None = None,
 ) -> str:
     client = OpenAI(
         api_key=config.api_key,
@@ -32,19 +35,23 @@ def explain_with_ai(
     )
 
     prompt = _build_prompt(stock_data, user_question)
+    messages: list[dict[str, str]] = [
+        {
+            "role": "system",
+            "content": (
+                "You are an experienced financial educator. "
+                "Use the conversation context to stay consistent, but only use the current stock data provided. "
+                "If the user references earlier turns, summarize or compare without inventing new prices or facts. "
+                "Avoid direct financial advice; focus on education and explanation."
+            ),
+        }
+    ]
+    if history:
+        messages.extend(history)
+    messages.append({"role": "user", "content": prompt})
     response = client.chat.completions.create(
         model=config.model,
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "You are an experienced financial advisor. "
-                    "Explain stock market concepts in simple terms. "
-                    "If user asks for some financial advice, explain everything properly and give conclusion based on your analysis of the numbers."
-                ),
-            },
-            {"role": "user", "content": prompt},
-        ],
+        messages=messages,
         temperature=0.7,
         max_tokens=500,
     )
